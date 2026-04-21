@@ -1,18 +1,20 @@
 import type { SongConfig } from '../audio/types';
 
+const BASE = import.meta.env.BASE_URL;
+
 export const songs: SongConfig[] = [
     {
-        id: 'xinmian',
+        id: 'heart',
         title: '使一颗心免于哀伤',
         sliceCount: 15,
-        baseUrl: '/audiocut/使一颗心免于哀伤_slices_ogg',
+        baseUrl: `${BASE}audiocut/使一颗心免于哀伤_slices_ogg`,
         filePattern: (index: number) => `使一颗心免于哀伤_${index}.ogg`,
     },
     {
-        id: 'yinhe',
+        id: 'galaxy',
         title: '在银河中孤独摇摆',
         sliceCount: 15,
-        baseUrl: '/audiocut/在银河中孤独摇摆_slices_ogg',
+        baseUrl: `${BASE}audiocut/在银河中孤独摇摆_slices_ogg`,
         filePattern: (index: number) => `在银河中孤独摇摆_${index}.ogg`,
     },
 ];
