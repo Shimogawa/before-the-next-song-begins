@@ -1,5 +1,5 @@
 import type { SongConfig, EngineCallbacks } from './types';
-import { loadSongBuffers } from './AudioLoader';
+import { loadSongBuffers, type LoadProgressCallback } from './AudioLoader';
 
 const SCHEDULER_INTERVAL_MS = 25;
 const LOOK_AHEAD_S = 0.1;
@@ -34,11 +34,13 @@ export class LoopEngine {
         this.callbacks = callbacks;
     }
 
-    async loadSong(song: SongConfig): Promise<void> {
+    async loadSong(song: SongConfig, onProgress?: LoadProgressCallback): Promise<void> {
         let buffers = this.bufferCache.get(song.id);
         if (!buffers) {
-            buffers = await loadSongBuffers(this.audioContext, song);
+            buffers = await loadSongBuffers(this.audioContext, song, onProgress);
             this.bufferCache.set(song.id, buffers);
+        } else {
+            onProgress?.(song.sliceCount, song.sliceCount);
         }
         this.currentBuffers = buffers;
         this.sliceCount = song.sliceCount;
@@ -46,9 +48,9 @@ export class LoopEngine {
         this.resetState();
     }
 
-    switchSong(song: SongConfig): Promise<void> {
+    switchSong(song: SongConfig, onProgress?: LoadProgressCallback): Promise<void> {
         this.emergencyStop();
-        return this.loadSong(song);
+        return this.loadSong(song, onProgress);
     }
 
     toggle(index: number): void {

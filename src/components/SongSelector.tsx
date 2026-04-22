@@ -4,10 +4,11 @@ interface SongSelectorProps {
     songs: SongConfig[];
     currentSongId: string | null;
     loadingSongId: string | null;
+    loadingProgress: number;
     onSelect: (song: SongConfig) => void;
 }
 
-export function SongSelector({ songs, currentSongId, loadingSongId, onSelect }: SongSelectorProps) {
+export function SongSelector({ songs, currentSongId, loadingSongId, loadingProgress, onSelect }: SongSelectorProps) {
     return (
         <div className="song-selector">
             {songs.map((song) => {
@@ -23,7 +24,11 @@ export function SongSelector({ songs, currentSongId, loadingSongId, onSelect }: 
                         }}
                     >
                         {song.title}
-                        {isLoadingThis && <span className="song-selector__loading" />}
+                        {isLoadingThis && (
+                            <span className="song-selector__loading">
+                                <span className="song-selector__progress">{loadingProgress}%</span>
+                            </span>
+                        )}
                     </button>
                 );
             })}

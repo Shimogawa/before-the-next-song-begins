@@ -9,6 +9,7 @@ interface UseLoopEngineReturn {
     volumes: number[];
     masterVolume: number;
     loopProgress: number;
+    loadingProgress: number;
     isLoading: boolean;
     isRunning: boolean;
     toggle: (index: number) => void;
@@ -33,6 +34,7 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
     const [volumes, setVolumes] = useState<number[]>([]);
     const [masterVolume, setMasterVolumeState] = useState(1);
     const [loopProgress, setLoopProgress] = useState(0);
+    const [loadingProgress, setLoadingProgress] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
 
@@ -52,7 +54,9 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
         });
         engineRef.current = engine;
 
-        engine.loadSong(initialSong).then(() => {
+        engine.loadSong(initialSong, (loaded, total) => {
+            if (!disposed) setLoadingProgress(Math.round((loaded / total) * 100));
+        }).then(() => {
             if (disposed) return;
             setCurrentSongId(initialSong.id);
             setLoadingSongId(null);
@@ -105,8 +109,11 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
         setLoadingSongId(song.id);
         setIsRunning(false);
         setLoopProgress(0);
+        setLoadingProgress(0);
 
-        await engine.switchSong(song);
+        await engine.switchSong(song, (loaded, total) => {
+            setLoadingProgress(Math.round((loaded / total) * 100));
+        });
 
         setCurrentSongId(song.id);
         setLoadingSongId(null);
@@ -177,6 +184,7 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
         sliceStates,
         volumes,
         masterVolume,
+        loadingProgress,
         loopProgress,
         isLoading,
         isRunning,

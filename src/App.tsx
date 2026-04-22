@@ -14,6 +14,7 @@ function App() {
     volumes,
     masterVolume,
     loopProgress,
+    loadingProgress,
     isLoading,
     isRunning,
     toggle,
@@ -33,6 +34,7 @@ function App() {
         songs={songs}
         currentSongId={currentSongId}
         loadingSongId={loadingSongId}
+        loadingProgress={loadingProgress}
         onSelect={switchSong}
       />
       <LoopProgressBar progress={loopProgress} isRunning={isRunning} />
