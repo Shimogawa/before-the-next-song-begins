@@ -34,6 +34,13 @@ export class LoopEngine {
         this.masterGain = audioContext.createGain();
         this.masterGain.connect(audioContext.destination);
         this.callbacks = callbacks;
+
+        // iOS 17+: switch from "ambient" to "playback" so audio
+        // is not muted when the device silent switch is on.
+        if ('audioSession' in navigator) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (navigator as any).audioSession.type = 'playback';
+        }
     }
 
     /**
