@@ -9,6 +9,7 @@ import './App.css';
 function App() {
   const {
     currentSongId,
+    loadingSongId,
     sliceStates,
     volumes,
     masterVolume,
@@ -31,7 +32,7 @@ function App() {
       <SongSelector
         songs={songs}
         currentSongId={currentSongId}
-        isLoading={isLoading}
+        loadingSongId={loadingSongId}
         onSelect={switchSong}
       />
       <LoopProgressBar progress={loopProgress} isRunning={isRunning} />

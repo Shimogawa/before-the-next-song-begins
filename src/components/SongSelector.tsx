@@ -3,26 +3,27 @@ import type { SongConfig } from '../audio/types';
 interface SongSelectorProps {
     songs: SongConfig[];
     currentSongId: string | null;
-    isLoading: boolean;
+    loadingSongId: string | null;
     onSelect: (song: SongConfig) => void;
 }
 
-export function SongSelector({ songs, currentSongId, isLoading, onSelect }: SongSelectorProps) {
+export function SongSelector({ songs, currentSongId, loadingSongId, onSelect }: SongSelectorProps) {
     return (
         <div className="song-selector">
             {songs.map((song) => {
                 const isActive = song.id === currentSongId;
+                const isLoadingThis = song.id === loadingSongId;
                 return (
                     <button
                         key={song.id}
                         className={`song-selector__btn ${isActive ? 'song-selector__btn--active' : ''}`}
-                        disabled={isLoading && isActive}
+                        disabled={loadingSongId !== null}
                         onClick={() => {
                             if (!isActive) onSelect(song);
                         }}
                     >
                         {song.title}
-                        {isLoading && isActive && <span className="song-selector__loading" />}
+                        {isLoadingThis && <span className="song-selector__loading" />}
                     </button>
                 );
             })}

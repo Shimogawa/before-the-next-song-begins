@@ -4,6 +4,7 @@ import type { SongConfig, SliceVisualState } from '../audio/types';
 
 interface UseLoopEngineReturn {
     currentSongId: string | null;
+    loadingSongId: string | null;
     sliceStates: SliceVisualState[];
     volumes: number[];
     masterVolume: number;
@@ -26,6 +27,7 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
     const rafRef = useRef<number>(0);
 
     const [currentSongId, setCurrentSongId] = useState<string | null>(null);
+    const [loadingSongId, setLoadingSongId] = useState<string | null>(initialSong.id);
     const [desiredState, setDesiredState] = useState<boolean[]>([]);
     const [activeState, setActiveState] = useState<boolean[]>([]);
     const [volumes, setVolumes] = useState<number[]>([]);
@@ -53,6 +55,7 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
         engine.loadSong(initialSong).then(() => {
             if (disposed) return;
             setCurrentSongId(initialSong.id);
+            setLoadingSongId(null);
             setDesiredState(new Array(initialSong.sliceCount).fill(false));
             setActiveState(new Array(initialSong.sliceCount).fill(false));
             setVolumes(new Array(initialSong.sliceCount).fill(1));
@@ -99,12 +102,14 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
         if (!engine) return;
 
         setIsLoading(true);
+        setLoadingSongId(song.id);
         setIsRunning(false);
         setLoopProgress(0);
 
         await engine.switchSong(song);
 
         setCurrentSongId(song.id);
+        setLoadingSongId(null);
         setDesiredState(new Array(song.sliceCount).fill(false));
         setActiveState(new Array(song.sliceCount).fill(false));
         setVolumes(new Array(song.sliceCount).fill(1));
@@ -168,6 +173,7 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
 
     return {
         currentSongId,
+        loadingSongId,
         sliceStates,
         volumes,
         masterVolume,
