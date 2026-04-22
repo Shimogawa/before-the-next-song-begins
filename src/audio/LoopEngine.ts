@@ -27,11 +27,31 @@ export class LoopEngine {
     private callbacks: EngineCallbacks;
     private sliceCount = 0;
 
+    private unlocked = false;
+
     constructor(audioContext: AudioContext, callbacks: EngineCallbacks) {
         this.audioContext = audioContext;
         this.masterGain = audioContext.createGain();
         this.masterGain.connect(audioContext.destination);
         this.callbacks = callbacks;
+    }
+
+    /**
+     * Unlock audio output on iOS Safari.
+     * Must be called from a user gesture (click/touchend).
+     * Playing a silent buffer is required to fully unlock iOS audio.
+     */
+    async unlock(): Promise<void> {
+        if (this.unlocked) return;
+        if (this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+        }
+        const buffer = this.audioContext.createBuffer(1, 1, 22050);
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.audioContext.destination);
+        source.start(0);
+        this.unlocked = true;
     }
 
     async loadSong(song: SongConfig, onProgress?: LoadProgressCallback): Promise<void> {
@@ -171,9 +191,9 @@ export class LoopEngine {
         }
     }
 
-    private startClock(): void {
+    private async startClock(): Promise<void> {
         if (this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+            await this.audioContext.resume();
         }
 
         this.originTime = this.audioContext.currentTime + STARTUP_OFFSET_S;

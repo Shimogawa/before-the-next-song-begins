@@ -85,21 +85,15 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const ensureResumed = useCallback(() => {
-        const ctx = audioContextRef.current;
-        if (ctx && ctx.state === 'suspended') {
-            ctx.resume();
-        }
-    }, []);
 
     const toggle = useCallback((index: number) => {
         const engine = engineRef.current;
         if (!engine) return;
-        ensureResumed();
+        engine.unlock();
         engine.toggle(index);
         setDesiredState(engine.getDesiredState());
         setIsRunning(engine.isRunning());
-    }, [ensureResumed]);
+    }, []);
 
     const switchSong = useCallback(async (song: SongConfig) => {
         const engine = engineRef.current;
@@ -140,11 +134,11 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
     const enableAll = useCallback(() => {
         const engine = engineRef.current;
         if (!engine) return;
-        ensureResumed();
+        engine.unlock();
         engine.enableAll();
         setDesiredState(engine.getDesiredState());
         setIsRunning(engine.isRunning());
-    }, [ensureResumed]);
+    }, []);
 
     const disableAll = useCallback(() => {
         const engine = engineRef.current;
@@ -166,9 +160,9 @@ export function useLoopEngine(initialSong: SongConfig): UseLoopEngineReturn {
     const skipToNext = useCallback(() => {
         const engine = engineRef.current;
         if (!engine) return;
-        ensureResumed();
+        engine.unlock();
         engine.skipToNext();
-    }, [ensureResumed]);
+    }, []);
 
     const sliceStates: SliceVisualState[] = desiredState.map((desired, i) => {
         const active = activeState[i] ?? false;
